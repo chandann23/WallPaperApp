@@ -6,6 +6,7 @@ import Suggested from "../suggested"
 import Liked from "../liked"
 import Library from "../library"
 import { Colors } from "@/constants/Colors"
+import { ThemedSafeAreaView } from "@/components/ThemedSafeAreaView"
 const Tab = createMaterialTopTabNavigator()
 
 export default function Foryou() {
@@ -21,13 +22,18 @@ export default function Foryou() {
   }, [])
 
   return (
-  <SafeAreaView style={styles.container}>
+  <ThemedSafeAreaView style={styles.container}>
     <Tab.Navigator  
       style={{flex:1}}
       screenOptions={{
         tabBarActiveTintColor:Colors[theme].tint,
         tabBarStyle:{
           backgroundColor : Colors[theme].background
+        },
+        tabBarIndicatorStyle:{
+          backgroundColor: Colors[theme].notch,
+          height:5
+
         }
       }}
 
@@ -36,7 +42,7 @@ export default function Foryou() {
       <Tab.Screen name="liked" component={Liked} />
       <Tab.Screen name="suggested" component={Suggested} />
     </Tab.Navigator>
-      </SafeAreaView>
+      </ThemedSafeAreaView>
   )
 }
 const styles = StyleSheet.create({

@@ -2,7 +2,7 @@ import { ThemedView } from "./ThemedView"
 import { View, StyleSheet, FlatList } from "react-native"
 import { ImageCard } from "./ImageCard"
 import { useState } from "react"
-import DownloadPicture from "@/components/BottomSheet";
+import {DownloadPicture} from "@/components/BottomSheet";
 import { WallPaper } from "@/hooks/UseWallPapers";
 
 export function SplitView({wallpapers, onScroll}: {

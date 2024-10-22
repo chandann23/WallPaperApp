@@ -5,7 +5,7 @@ import { useColorScheme } from 'react-native';
 export default function TabLayout() {
   const theme = useColorScheme() ?? "light";
   return (
-    <Tabs screenOptions={{ 
+    <Tabs screenOptions={{
       tabBarActiveTintColor: Colors[theme].tint,
       tabBarStyle: {
         backgroundColor: Colors[theme].background,
@@ -22,10 +22,10 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
         }}
       />
-        
 
 
-        <Tabs.Screen
+
+      <Tabs.Screen
         name="index"
         options={{
           title: 'explore',
@@ -34,12 +34,12 @@ export default function TabLayout() {
         }}
       />
 
-        <Tabs.Screen
+      <Tabs.Screen
         name="account"
         options={{
           title: 'account',
           headerShown: false,
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome size={28} name="user" color={color} />,
         }}
       />
 

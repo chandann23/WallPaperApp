@@ -1,14 +1,20 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, Image, Button, useColorScheme, Pressable } from 'react-native';
+import { View, Image, StyleSheet, Button, useColorScheme, Pressable, Text } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
-import { WallPaper } from '@/hooks/UseWallPapers';
-import { Ionicons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Colors } from '@/constants/Colors';
 import { ThemedText } from './ThemedText';
-const DowmloadPicture = ({ onClose, wallpaper }: { onClose: () => void, wallpaper: WallPaper }) => {
+import { ThemedView } from './ThemedView';
+import { WallPaper } from '@/hooks/UseWallPapers';
+import * as MediaLibrary from 'expo-media-library';
+import * as FileSystem from 'expo-file-system';
+export const DownloadPicture = ({ onClose, wallpaper}: {
+    onClose: () => void;
+    wallpaper: WallPaper;
+}) => {
   // ref
-  const theme = useColorScheme() ?? 'light';
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const theme = useColorScheme() ?? 'light';
 
   // callbacks
   const handleSheetChanges = useCallback((index: number) => {
@@ -20,70 +26,88 @@ const DowmloadPicture = ({ onClose, wallpaper }: { onClose: () => void, wallpape
     <BottomSheet
       onClose={onClose}
       snapPoints={["95%"]}
-      enablePanDownToClose={true}
       ref={bottomSheetRef}
       onChange={handleSheetChanges}
-      handleIndicatorStyle={{
-        display: 'none',
-      }}
-      handleStyle={{
-        display: 'none',
-      }}
+      enablePanDownToClose={true}
+      handleIndicatorStyle={{ display: "none" }}
+      handleStyle={{ display: "none" }}
     >
       <BottomSheetView style={styles.contentContainer}>
-        <Image style={styles.image} source={{ uri: wallpaper.url }} />
-        <View style={styles.topbar}>
-          <Ionicons
-            name={"close"}
-            size={24}
-            color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
-          />
-          <View style={styles.iconsBar}>
+        <ThemedView style={{flex: 1}}>
+          <Image style={styles.image} source={{uri: wallpaper.url}} />
+          <View style={styles.topbar}>
             <Ionicons
-              name={"heart"}
-              size={24}
-              color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
+                onPress={onClose}
+                name={'close'}
+                size={24}
+                color={theme === 'light' ? Colors.light.icon : Colors.dark.text}
             />
-            <Ionicons
-              name={"share"}
-              size={24}
-              color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
-              style={{ paddingLeft: 6 }}
-            />
+            <View style={styles.topbarInner}>
+              <Ionicons
+                  name={'heart'}
+                  size={24}
+                  color={theme === 'light' ? Colors.light.icon : Colors.dark.text}
+              />
+              <Ionicons
+                  name={'share'}
+                  size={24}
+                  color={theme === 'light' ? Colors.light.icon : Colors.dark.text}
+                  style={{paddingLeft: 4}}
+              />
+            </View>
           </View>
-        </View>
-        <View style={styles.textContainer}>
-          <ThemedText style={styles.text}>{wallpaper.name}</ThemedText>
-        </View>
-        <DownlaodButton />
+          <ThemedView style={styles.textContainer}>
+            <ThemedText style={styles.text}>{wallpaper.name}</ThemedText>
+          </ThemedView>
+          <DownloadButton url={wallpaper.url} />
+        </ThemedView>
       </BottomSheetView>
     </BottomSheet>
   );
 };
 
-function DownlaodButton() {
-
+function DownloadButton({ url }: { url: string }) {
   const theme = useColorScheme() ?? 'light';
-  return (
-
-    <Pressable
-      style={
-        { backgroundColor: "black", padding: 10, margin: 20, justifyContent: "center", flexDirection: "row", borderRadius: 10 }}>
-
-      <Ionicons
-        style={{ paddingRight: 5, paddingBottom: 3 }}
-        name={"download"}
-        size={24}
-        color={theme === "light" ? Colors.light.icon : Colors.dark.icon}
-      />
-
-      <Text style={{ fontSize: 20, color: "white", fontWeight: "600" }}>Download</Text>
-
-    </Pressable>
-
-  )
+  return <Pressable onPress={async () => {
+    let date = new Date().getTime();
+    let fileUri = FileSystem.documentDirectory + `${date}.jpg`;
+    
+    try {
+        await FileSystem.downloadAsync(url, fileUri)
+        const response = await MediaLibrary.requestPermissionsAsync(true)
+        if (response.granted) {
+          MediaLibrary.createAssetAsync(fileUri)
+          alert("Image saved")
+        } else {
+          console.error("permission not granted")
+        }
+    } catch (err) {
+        console.log("FS Err: ", err)
+    }
+  }} style={{
+    backgroundColor: "black",
+    padding: 10,
+    marginHorizontal: 40,
+    marginVertical: 20,
+    justifyContent: "center",
+    flexDirection: "row",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: theme === 'light' ? Colors.light.text : Colors.dark.icon,
+  }}>
+    <Ionicons
+      name={'download'}
+      size={24}
+      color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
+      style={{paddingRight: 4}}
+    />
+    <Text style={{
+      fontSize: 20,
+      color: "white",
+      fontWeight: "600",
+    }}>Download</Text>
+  </Pressable>
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -93,34 +117,28 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   image: {
-    height: '80%',
+    height: "70%",
     borderRadius: 15,
   },
   topbar: {
-    width: '100%',
-    position: 'absolute',
-    flexDirection: 'row',
+    position: "absolute",
     padding: 10,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'stretch',
+    display: "flex",
+    justifyContent: "space-between",
+    flexDirection: "row",
+    width: "100%"
   },
-  iconsBar: {
-    display: 'flex',
-    flexDirection: 'row',
+  topbarInner: {
+    display: "flex",
+    flexDirection: "row",
   },
   textContainer: {
-    width: '100%'
+    width: "100%"
   },
   text: {
-    fontSize: 30,
-    fontWeight: "600",
     paddingTop: 20,
-    color: Colors.light.text,
-    textAlign: 'center',
-
+    textAlign: "center",
+    fontSize: 30,
+    fontWeight: "600"
   }
-
 });
-
-export default DowmloadPicture;

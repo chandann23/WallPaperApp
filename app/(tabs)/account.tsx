@@ -15,7 +15,18 @@ export default function account() {
         <LoginButtons />
         <ThemeSelector />
         <AppIcons />
-        <ThemedText style={{ fontSize: 12, fontWeight: "light", textAlign: "center" }}>Panels © 2024</ThemedText>
+      <About />
+           </ThemedView>
+    </ScrollView>
+  </ThemedSafeAreaView>
+}
+
+
+
+function About (){
+  return (
+     <View>
+   <ThemedText style={{ fontSize: 12, fontWeight: "light", textAlign: "center" }}>Panels © 2024</ThemedText>
 
 
         <ThemedText style={{ fontSize: 12, fontWeight: "light", textAlign: "center" }}>Panels WallPaper Mobile App LLC.</ThemedText>
@@ -28,9 +39,12 @@ export default function account() {
 
         <ThemedText style={{ fontSize: 18, fontWeight: "semibold", padding: 20 }}>Version 1.2.3</ThemedText>
 
-      </ThemedView>
-    </ScrollView>
-  </ThemedSafeAreaView>
+
+
+      </View> 
+
+
+  )
 }
 
 
